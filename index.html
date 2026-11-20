@@ -18,6 +18,9 @@
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jayalath">
 <style>
 :root{--blue:#155da8;--blue2:#2678c8;--navy:#12365c;--pale:#eef5fc;--ink:#17283b;--muted:#68788a;--line:#dce5ee;--white:#fff;--shadow:0 12px 34px rgba(20,55,90,.10)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,"Noto Sans Sinhala","Noto Sans Tamil",Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.5}button,input,select,textarea{font:inherit}button,a{cursor:pointer}a{text-decoration:none;color:inherit}.wrap{width:min(1160px,92%);margin:auto}.demo{background:#fff4d8;color:#79530b;text-align:center;padding:7px 12px;font-size:12px;font-weight:700;letter-spacing:.04em}
@@ -65,7 +68,7 @@ body.menu-open .mobile-drawer{transform:translateX(0)}
 .drawer-links a:active,.drawer-links a:hover{background:var(--pale);color:var(--blue)}
 .drawer-links .drawer-icon{width:24px;text-align:center;color:var(--blue);font-size:18px}
 .drawer-contact{margin-top:auto;padding-top:18px;display:grid;gap:10px}
-.drawer-promise{font-size:12px;line-height:1.5;color:var(--muted);text-align:center;padding:12px;background:var(--pale);border-radius:10px}
+.install-btn{background:#12365c!important;color:#fff!important}.install-btn[hidden]{display:none!important}.drawer-promise{font-size:12px;line-height:1.5;color:var(--muted);text-align:center;padding:12px;background:var(--pale);border-radius:10px}
 @media(max-width:620px){.menu-toggle{display:inline-flex}.nav{gap:8px}.brand-logo{width:clamp(145px,42vw,205px);max-width:100%}.navright{gap:7px}.lang{max-width:none;padding:8px 4px;font-size:14px}}
 @media(min-width:621px){.drawer-backdrop,.mobile-drawer{display:none!important}}
 </style>
@@ -89,7 +92,7 @@ body.menu-open .mobile-drawer{transform:translateX(0)}
     <a href="#about" onclick="mobileNavigate('home','about')"><span class="drawer-icon">ⓘ</span><span data-en="About us" data-si="අප ගැන" data-ta="எங்களைப் பற்றி">අප ගැන</span></a>
     <a href="#contact" onclick="mobileNavigate('home','contact')"><span class="drawer-icon">☎</span><span data-en="Contact us" data-si="අප අමතන්න" data-ta="எங்களைத் தொடர்புகொள்ள">අප අමතන්න</span></a>
   </nav>
-  <div class="drawer-contact"><a class="btn outline" href="tel:+94765606450" data-en="Call Jayalath" data-si="ජයලත් මහතා අමතන්න" data-ta="ஜயலத்தை அழைக்கவும்">ජයලත් මහතා අමතන්න</a><a class="btn whatsapp-btn" href="https://wa.me/94765606450" target="_blank" rel="noopener" data-en="WhatsApp enquiry" data-si="වට්ස්ඇප් මඟින් විමසන්න" data-ta="வாட்ஸ்அப் மூலம் விசாரிக்க">වට්ස්ඇප් මඟින් විමසන්න</a><div class="drawer-promise" data-en="Fair prices. Honest information. Trusted service." data-si="සාධාරණ මිල ගණන්. අවංක තොරතුරු. විශ්වාසදායක සේවාව." data-ta="நியாயமான விலைகள். நேர்மையான தகவல்கள். நம்பகமான சேவை.">සාධාරණ මිල ගණන්. අවංක තොරතුරු. විශ්වාසදායක සේවාව.</div></div>
+  <div class="drawer-contact"><button type="button" class="btn install-btn" hidden onclick="installApp()" data-en="📲 Install app" data-si="📲 ඇප් එක install කරන්න" data-ta="📲 செயலியை நிறுவுக">📲 Install app</button><a class="btn outline" href="tel:+94765606450" data-en="Call Jayalath" data-si="ජයලත් මහතා අමතන්න" data-ta="ஜயலத்தை அழைக்கவும்">ජයලත් මහතා අමතන්න</a><a class="btn whatsapp-btn" href="https://wa.me/94765606450" target="_blank" rel="noopener" data-en="WhatsApp enquiry" data-si="වට්ස්ඇප් මඟින් විමසන්න" data-ta="வாட்ஸ்அப் மூலம் விசாரிக்க">වට්ස්ඇප් මඟින් විමසන්න</a><div class="drawer-promise" data-en="Fair prices. Honest information. Trusted service." data-si="සාධාරණ මිල ගණන්. අවංක තොරතුරු. විශ්වාසදායක සේවාව." data-ta="நியாயமான விலைகள். நேர்மையான தகவல்கள். நம்பகமான சேவை.">සාධාරණ මිල ගණන්. අවංක තොරතුරු. විශ්වාසදායක සේවාව.</div></div>
 </aside>
 <main id="homePage">
 <div class="hero"><div class="wrap"><div class="hero-in">
@@ -345,4 +348,12 @@ setLang('si');
 
 </script>
 <script src="assets/voice.js?v=1" defer></script>
+<script>
+/* App (PWA): lets visitors add JAYALATH PROPERTIES to their phone home screen */
+var installPrompt=null;
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();installPrompt=e;document.querySelectorAll('.install-btn').forEach(function(b){b.hidden=false;});});
+function installApp(){if(!installPrompt)return;installPrompt.prompt();installPrompt.userChoice.finally(function(){installPrompt=null;document.querySelectorAll('.install-btn').forEach(function(b){b.hidden=true;});});try{gtag('event','app_install_click');}catch(e){}}
+window.addEventListener('appinstalled',function(){document.querySelectorAll('.install-btn').forEach(function(b){b.hidden=true;});});
+</script>
 </body></html>
