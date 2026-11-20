@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="150" viewBox="0 0 520 150" role="img" aria-labelledby="title desc">
+<title id="title">JAYALATH PROPERTIES</title>
+<desc id="desc">Blue and gold real estate logo with a house roof and rising sun.</desc>
+<defs>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2678c8"/><stop offset="1" stop-color="#12365c"/></linearGradient>
+</defs>
+<g transform="translate(10 7)">
+  <path d="M10 67 L83 10 L157 67" fill="none" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M28 65 V124 H138 V65" fill="none" stroke="#155da8" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M72 124 V83 H103 V124" fill="#e8f2fc" stroke="#155da8" stroke-width="6"/>
+  <path d="M128 25 A27 27 0 0 1 155 52" fill="none" stroke="#e5a900" stroke-width="8" stroke-linecap="round"/>
+  <path d="M155 15 V3 M174 29 L184 20 M165 51 H179" stroke="#e5a900" stroke-width="6" stroke-linecap="round"/>
+</g>
+<text x="205" y="70" font-family="Arial, sans-serif" font-size="43" font-weight="800" letter-spacing="1.5" fill="#12365c">JAYALATH</text>
+<text x="207" y="111" font-family="Arial, sans-serif" font-size="30" font-weight="800" letter-spacing="4" fill="#2678c8">PROPERTIES</text>
+<path d="M207 126 H488" stroke="#e5a900" stroke-width="4" stroke-linecap="round"/>
+<text x="208" y="145" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#68788a">BUY  •  SELL  •  RENT  •  INVEST</text>
+</svg>
