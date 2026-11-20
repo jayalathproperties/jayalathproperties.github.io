@@ -4,7 +4,7 @@
    - Logo, icons, pictures: served from the phone for speed, refreshed in the background.
    - Never touches WhatsApp, Google or any other website.
    When you change this file, change VERSION (e.g. jp-v2) so phones pick up the update. */
-var VERSION = "jp-v1";
+var VERSION = "jp-v2";
 var CORE = ["./", "./index.html", "./manifest.webmanifest", "./assets/logo.svg", "./assets/icon-192.png", "./assets/voice.js?v=1"];
 
 self.addEventListener("install", function (e) {
