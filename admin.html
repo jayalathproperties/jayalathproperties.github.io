@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b2545">
+<title>JP Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#f3f5f9;color:#14213d;font-size:16px;line-height:1.4}
+.top{background:#0b2545;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:5}
+.top b{font-size:16px}
+.top small{opacity:.85}
+.wrap{max-width:760px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:12px;padding:14px;margin:0 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{font-size:18px;margin:0 0 10px}
+h3{font-size:15px;margin:14px 0 6px}
+label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+.hint{font-size:12px;color:#5c667a;font-weight:400}
+input,select,textarea{width:100%;font-size:16px;padding:10px;border:1px solid #c5cbd8;border-radius:8px;background:#fff;color:#14213d;font-family:inherit}
+textarea{min-height:84px;resize:vertical}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.btn{display:inline-block;border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;background:#0b2545;color:#fff;min-height:46px}
+.btn.gold{background:#c9a227;color:#14213d}
+.btn.green{background:#1b7f3b}
+.btn.red{background:#b00020}
+.btn.light{background:#e6eaf2;color:#14213d}
+.btn.small{padding:8px 12px;font-size:14px;min-height:38px;border-radius:8px}
+.btn.full{width:100%}
+.btn:disabled{opacity:.5}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;background:#e6eaf2;color:#14213d}
+.chip.pub{background:#d9f2e0;color:#14612b}
+.chip.draft{background:#fff1c7;color:#7a5a00}
+.chip.sold{background:#fde0e0;color:#8a1c1c}
+.chip.ver{background:#dbe8ff;color:#1a3f8a}
+.stats{display:flex;gap:8px;margin-bottom:10px}
+.stat{flex:1;background:#fff;border-radius:10px;padding:8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:12px;color:#5c667a}
+.prop{display:flex;gap:10px}
+.thumb{width:84px;height:84px;border-radius:8px;object-fit:cover;background:#e6eaf2;flex:none}
+.pinfo{flex:1;min-width:0}
+.pinfo .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pinfo .s{font-size:13px;color:#5c667a}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.steps{display:flex;gap:6px;margin-bottom:12px}
+.steps button{flex:1;border:0;border-radius:8px;padding:10px 4px;font-size:13px;font-weight:700;background:#e6eaf2;color:#14213d}
+.steps button.on{background:#0b2545;color:#fff}
+.private{border:2px solid #b00020;border-radius:10px;padding:10px;margin-top:14px;background:#fff6f7}
+.private h3{color:#b00020;margin-top:0}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.ph{position:relative}
+.ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#e6eaf2;display:block}
+.ph .x{position:absolute;top:4px;right:4px;background:#b00020;color:#fff;border:0;border-radius:50%;width:28px;height:28px;font-size:16px}
+.ph .c{position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.65);color:#fff;border:0;border-radius:6px;font-size:11px;padding:3px 6px}
+.ph .first{position:absolute;left:4px;bottom:4px;background:#c9a227;color:#14213d;border-radius:6px;font-size:11px;font-weight:700;padding:3px 6px}
+.check{margin:4px 0;font-size:14px}
+.ok{color:#1b7f3b}
+.bad{color:#b00020}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#14213d;color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;z-index:20;max-width:90%;text-align:center;display:none}
+.toast.bad{background:#b00020}
+.login{max-width:380px;margin:40px auto}
+.msg{color:#b00020;font-size:14px;margin:8px 0}
+.empty{text-align:center;color:#5c667a;padding:24px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+(function () {
+"use strict";
+
+/* ---- 1. SETTINGS ---- */
+var API = "https://script.google.com/macros/s/AKfycbyGP-MhN4vhOl_CbiuufMrkFvcatmQ4Qlmjbx7XJDHRExjmgdQGtbLnrcZZveZBNJm6ZA/exec";
+var USERS = ["Rathna", "Jayalath"];
+var DISTRICTS = ["Colombo","Gampaha","Kalutara","Kandy","Matale","Nuwara Eliya","Galle","Matara","Hambantota","Jaffna","Kilinochchi","Mannar","Vavuniya","Mullaitivu","Batticaloa","Ampara","Trincomalee","Kurunegala","Puttalam","Anuradhapura","Polonnaruwa","Badulla","Monaragala","Ratnapura","Kegalle"];
+var CATEGORIES = ["Land","House","Apartment","Villa","Hotel","Guest house","Commercial building","Business for sale","Other"];
+var AVAIL = ["Available","Reserved","Sold","Rented","Unavailable"];
+var VERIFY = ["Owner-provided","Pending confirmation","Verified"];
+var EDITABLE = ["publish_status","availability","verification","featured","listing_type","category",
+  "title_si","title_en","title_ta","description_si","description_en","description_ta",
+  "price","currency","price_period","negotiable","district","town","location_privacy","lat","lng",
+  "land_size","land_unit","floor_area_sqft","bedrooms","bathrooms","photo_ids","video_url",
+  "price_confirmed_on","show_sold_price",
+  "private_owner_name","private_owner_phone","private_address","private_notes"];
+
+/* ---- 2. STATE ---- */
+var S = { user: "", token: "", list: [], filter: "all", q: "", edit: null, photos: [], step: 1, busy: false, view: "login" };
+var app = document.getElementById("app");
+
+/* ---- 3. SMALL HELPERS ---- */
+function esc(s) {
+  return String(s === null || s === undefined ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function today() {
+  var d = new Date();
+  var m = String(d.getMonth() + 1); if (m.length < 2) m = "0" + m;
+  var dd = String(d.getDate()); if (dd.length < 2) dd = "0" + dd;
+  return d.getFullYear() + "-" + m + "-" + dd;
+}
+function money(n) {
+  var x = Number(n);
+  if (!isFinite(x) || String(n) === "") return "-";
+  return "Rs. " + x.toLocaleString("en-US");
+}
+function titleOf(p) { return p.title_si || p.title_en || p.title_ta || "(no title)"; }
+function thumb(id, w) { return "https://drive.google.com/thumbnail?id=" + encodeURIComponent(id) + "&sz=w" + w; }
+function img(id, w, cls) {
+  var alt = "https://lh3.googleusercontent.com/d/" + encodeURIComponent(id);
+  return '<img class="' + cls + '" loading="lazy" src="' + esc(thumb(id, w)) + '" onerror="this.onerror=null;this.src=\'' + esc(alt) + '\'" alt="">';
+}
+function firstPhoto(p) { return String(p.photo_ids || "").split(",").map(function (s) { return s.trim(); }).filter(String)[0] || ""; }
+function isSold(p) { return p.availability === "Sold" || p.availability === "Rented"; }
+
+var toastTimer = null;
+function toast(msg, bad, sticky) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast" + (bad ? " bad" : "");
+  t.style.display = "block";
+  if (toastTimer) clearTimeout(toastTimer);
+  if (!sticky) toastTimer = setTimeout(function () { t.style.display = "none"; }, 3800);
+}
+function hideToast() { document.getElementById("toast").style.display = "none"; }
+
+function opts(list, val, blank) {
+  var h = blank ? '<option value="">' + esc(blank) + "</option>" : "";
+  list.forEach(function (o) { h += '<option value="' + esc(o) + '"' + (o === val ? " selected" : "") + ">" + esc(o) + "</option>"; });
+  return h;
+}
+function inp(f, type, ph) {
+  var v = S.edit[f];
+  return '<input data-f="' + f + '" type="' + (type || "text") + '"' + (type === "number" ? ' inputmode="decimal" step="any"' : "") +
+    ' value="' + esc(v) + '" placeholder="' + esc(ph || "") + '">';
+}
+function sel(f, list, blank) { return '<select data-f="' + f + '">' + opts(list, S.edit[f], blank) + "</select>"; }
+function fld(label, inner, hint) {
+  return "<label>" + esc(label) + (hint ? ' <span class="hint">' + esc(hint) + "</span>" : "") + "</label>" + inner;
+}
+
+/* ---- 4. TALKING TO THE API ---- */
+function api(action, extra) {
+  var body = { action: action, user: S.user, token: S.token };
+  Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
+  return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) })
+    .then(function (r) { return r.json(); })
+    .catch(function () { return { ok: false, error: "NETWORK" }; });
+}
+function saveSession() {
+  try { localStorage.setItem("jp_admin", JSON.stringify({ user: S.user, token: S.token, t: Date.now() })); } catch (e) {}
+}
+function clearSession() {
+  try { localStorage.removeItem("jp_admin"); } catch (e) {}
+  S.user = ""; S.token = ""; S.list = []; S.edit = null;
+}
+function sessionEnd() {
+  S.busy = false; hideToast(); clearSession();
+  S.view = "login";
+  render("Session ended. Please log in again.");
+}
+function errText(code) {
+  var m = {
+    NETWORK: "No internet or the server did not answer. Try again.",
+    SERVER: "Server problem. Try again in a minute.",
+    NOT_FOUND: "Property not found.",
+    TOO_BIG: "Photo too big.",
+    NOT_JPEG: "Photo must be a JPEG.",
+    BAD_PUBLISH_STATUS: "Bad publish status.",
+    BAD_AVAILABILITY: "Bad availability.",
+    BAD_VERIFICATION: "Bad verification."
+  };
+  return m[code] || ("Error: " + code);
+}
+
+/* ---- 5. VIEWS ---- */
+function topbar() {
+  return '<div class="top"><b>Jayalath Properties &middot; Admin</b><span><small>' + esc(S.user) +
+    '</small> <button class="btn light small" data-act="logout">Logout</button></span></div>';
+}
+
+function viewLogin(msg) {
+  return '<div class="wrap login"><div class="card"><h2>Admin login</h2>' +
+    fld("Who are you?", '<select id="lg_user">' + opts(USERS, S.user || "") + "</select>") +
+    fld("Password", '<input id="lg_pass" type="password" autocomplete="current-password">') +
+    (msg ? '<div class="msg">' + esc(msg) + "</div>" : "") +
+    '<p><button class="btn full" data-act="login">Log in</button></p>' +
+    '<p class="hint">Private page. Do not share the link or password.</p></div></div>';
+}
+
+function counts() {
+  var c = { all: S.list.length, pub: 0, draft: 0, sold: 0 };
+  S.list.forEach(function (p) {
+    if (p.publish_status === "Published") c.pub++;
+    if (p.publish_status === "Draft") c.draft++;
+    if (isSold(p)) c.sold++;
+  });
+  return c;
+}
+
+function viewList() {
+  var c = counts();
+  return topbar() + '<div class="wrap">' +
+    '<div class="stats"><div class="stat"><b>' + c.all + "</b><span>Total</span></div>" +
+    '<div class="stat"><b>' + c.pub + "</b><span>Published</span></div>" +
+    '<div class="stat"><b>' + c.draft + "</b><span>Drafts</span></div>" +
+    '<div class="stat"><b>' + c.sold + "</b><span>Sold/Rented</span></div></div>" +
+    '<p><button class="btn gold full" data-act="add">+ Add new property</button></p>' +
+    '<div class="row"><select id="flt">' +
+    [["all", "All"], ["Published", "Published"], ["Draft", "Drafts"], ["Archived", "Archived"], ["sold", "Sold / Rented"]]
+      .map(function (o) { return '<option value="' + o[0] + '"' + (S.filter === o[0] ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") +
+    '</select><input id="q" placeholder="Search..." value="' + esc(S.q) + '"></div>' +
+    '<p style="text-align:right;margin:6px 0"><button class="btn light small" data-act="refresh">&#x21bb; Refresh</button></p>' +
+    '<div id="cards">' + cardsHtml() + "</div></div>";
+}
+
+function filtered() {
+  var q = S.q.trim().toLowerCase();
+  return S.list.filter(function (p) {
+    if (S.filter === "sold") { if (!isSold(p)) return false; }
+    else if (S.filter !== "all" && p.publish_status !== S.filter) return false;
+    if (q) {
+      var hay = [p.property_id, p.title_si, p.title_en, p.title_ta, p.town, p.district, p.category].join(" ").toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  }).sort(function (a, b) { return String(b.property_id).localeCompare(String(a.property_id)); });
+}
+
+function cardsHtml() {
+  var arr = filtered();
+  if (!arr.length) return '<div class="empty">No properties here yet.<br>Tap "+ Add new property".</div>';
+  return arr.map(function (p) {
+    var fp = firstPhoto(p);
+    var pubClass = p.publish_status === "Published" ? "pub" : "draft";
+    var sold = isSold(p);
+    return '<div class="card"><div class="prop">' +
+      (fp ? img(fp, 200, "thumb") : '<div class="thumb"></div>') +
+      '<div class="pinfo"><div class="t">' + esc(titleOf(p)) + "</div>" +
+      '<div class="s">' + esc(p.property_id) + " &middot; " + esc(p.category) + " &middot; " + esc(p.listing_type) + "</div>" +
+      '<div class="s">' + esc([p.town, p.district].filter(String).join(", ")) + " &middot; <b>" + esc(money(p.price)) + "</b></div></div></div>" +
+      '<div class="chips"><span class="chip ' + pubClass + '">' + esc(p.publish_status) + "</span>" +
+      '<span class="chip' + (sold ? " sold" : "") + '">' + esc(p.availability) + "</span>" +
+      '<span class="chip ver">' + esc(p.verification) + "</span></div>" +
+      '<div class="acts"><button class="btn small" data-act="edit" data-id="' + esc(p.property_id) + '">Edit</button>' +
+      (p.publish_status === "Published"
+        ? '<button class="btn light small" data-act="unpub" data-id="' + esc(p.property_id) + '">Unpublish</button>'
+        : '<button class="btn green small" data-act="pub" data-id="' + esc(p.property_id) + '">Publish</button>') +
+      (sold
+        ? '<button class="btn light small" data-act="back" data-id="' + esc(p.property_id) + '">Back on market</button>'
+        : '<button class="btn red small" data-act="sold" data-id="' + esc(p.property_id) + '">Mark ' + (p.listing_type === "Rent" ? "Rented" : "Sold") + "</button>") +
+      "</div></div>";
+  }).join("");
+}
+
+function stepsBar() {
+  var saved = !!S.edit.property_id;
+  function b(n, label) {
+    return '<button data-act="step' + n + '" class="' + (S.step === n ? "on" : "") + '"' + (n > 1 && !saved ? " disabled" : "") + ">" + label + "</button>";
+  }
+  return '<div class="steps">' + b(1, "1. Details") + b(2, "2. Photos") + b(3, "3. Publish") + "</div>";
+}
+
+function viewEdit() {
+  return topbar() + '<div class="wrap"><p><button class="btn light small" data-act="cancel">&larr; Back to list</button> ' +
+    (S.edit.property_id ? "<b>" + esc(S.edit.property_id) + "</b>" : "<b>New property</b>") + "</p>" +
+    stepsBar() + '<div id="step">' + stepHtml() + "</div></div>";
+}
+
+function stepHtml() {
+  if (S.step === 1) return step1Html();
+  if (S.step === 2) return step2Html();
+  return step3Html();
+}
+
+function step1Html() {
+  return '<div class="card"><h2>Property details</h2>' +
+    '<div class="row"><div>' + fld("For", sel("listing_type", ["Sale", "Rent"])) + "</div><div>" + fld("Type", sel("category", CATEGORIES)) + "</div></div>" +
+    fld("Title - Sinhala", inp("title_si", "text", "e.g. Kurunegala land"), "write at least one language") +
+    fld("Title - English", inp("title_en", "text")) +
+    fld("Title - Tamil", inp("title_ta", "text")) +
+    fld("Description - Sinhala", '<textarea data-f="description_si">' + esc(S.edit.description_si) + "</textarea>") +
+    fld("Description - English", '<textarea data-f="description_en">' + esc(S.edit.description_en) + "</textarea>") +
+    fld("Description - Tamil", '<textarea data-f="description_ta">' + esc(S.edit.description_ta) + "</textarea>") +
+    '<div class="row"><div>' + fld("Price (Rs.)", inp("price", "number"), S.edit.listing_type === "Rent" ? "per month" : "total") + "</div><div>" +
+    fld("Negotiable?", sel("negotiable", ["Yes", "No"])) + "</div></div>" +
+    '<div class="row"><div>' + fld("District", sel("district", DISTRICTS, "- choose -")) + "</div><div>" + fld("Town / area", inp("town")) + "</div></div>" +
+    fld("Location on public site", sel("location_privacy", ["Approximate", "Exact"]), "Approximate = no map pin shown") +
+    '<div class="row"><div>' + fld("Latitude", inp("lat", "number"), "optional") + "</div><div>" + fld("Longitude", inp("lng", "number"), "optional") + "</div></div>" +
+    '<div class="row"><div>' + fld("Land size", inp("land_size", "number")) + "</div><div>" + fld("Unit", sel("land_unit", ["Perches", "Acres", "Sq ft"])) + "</div></div>" +
+    '<div class="row"><div>' + fld("House size (sq ft)", inp("floor_area_sqft", "number")) + "</div><div>" + fld("Bedrooms", inp("bedrooms", "number")) + "</div><div>" + fld("Bathrooms", inp("bathrooms", "number")) + "</div></div>" +
+    fld("Video link", inp("video_url", "url", "YouTube / Facebook link"), "optional") +
+    '<div class="row"><div>' + fld("Verification", sel("verification", VERIFY)) + "</div><div>" + fld("Price confirmed on", inp("price_confirmed_on", "date")) + "</div></div>" +
+    fld("Featured (show first)?", sel("featured", ["No", "Yes"])) +
+    '<div class="private"><h3>&#128274; PRIVATE - never shown on the website</h3>' +
+    fld("Owner name", inp("private_owner_name")) + fld("Owner phone", inp("private_owner_phone", "tel")) +
+    fld("Exact address", inp("private_address")) +
+    fld("Notes", '<textarea data-f="private_notes">' + esc(S.edit.private_notes) + "</textarea>") + "</div>" +
+    '<p style="margin-top:14px"><button class="btn gold full" data-act="next1">Save &amp; next: Photos &rarr;</button></p></div>';
+}
+
+function step2Html() {
+  var h = '<div class="card"><h2>Photos</h2><p class="hint">Only Rathna or Jayalath add photos. Photos are shrunk on your phone before upload. The first photo is the cover.</p>' +
+    '<input id="files" type="file" accept="image/*" multiple>' +
+    '<div class="photos">';
+  S.photos.forEach(function (id, i) {
+    h += '<div class="ph">' + img(id, 300, "") +
+      '<button class="x" data-act="rmphoto" data-id="' + i + '">&times;</button>' +
+      (i === 0 ? '<span class="first">COVER</span>' : '<button class="c" data-act="cover" data-id="' + i + '">Make cover</button>') + "</div>";
+  });
+  h += "</div>" + (S.photos.length ? "" : '<p class="empty">No photos yet.</p>') +
+    '<p><button class="btn gold full" data-act="next2">Save &amp; next: Preview &rarr;</button></p></div>';
+  return h;
+}
+
+function perPerch(p) {
+  if (p.land_unit === "Perches" && Number(p.price) > 0 && Number(p.land_size) > 0 && p.listing_type !== "Rent") {
+    return "About Rs. " + Math.round(Number(p.price) / Number(p.land_size)).toLocaleString("en-US") + " per perch";
+  }
+  return "";
+}
+
+function step3Html() {
+  var p = S.edit;
+  var hasTitle = !!(p.title_si || p.title_en || p.title_ta);
+  var checks = [
+    [hasTitle, "Title written"],
+    [p.category, "Type chosen"],
+    [Number(p.price) > 0, "Price entered"],
+    [p.district, "District chosen"],
+    [S.photos.length > 0, "At least 1 photo (recommended)"],
+    [p.private_owner_phone, "Owner phone saved (private)"]
+  ];
+  var ready = hasTitle && p.category && Number(p.price) > 0 && p.district;
+  var ch = checks.map(function (c) { return '<div class="check ' + (c[0] ? "ok" : "bad") + '">' + (c[0] ? "&#10003; " : "&#10007; ") + esc(c[1]) + "</div>"; }).join("");
+  var isPub = p.publish_status === "Published";
+  return '<div class="card"><h2>Preview</h2><div class="prop">' +
+    (S.photos[0] ? img(S.photos[0], 200, "thumb") : '<div class="thumb"></div>') +
+    '<div class="pinfo"><div class="t">' + esc(titleOf(p)) + "</div>" +
+    '<div class="s">' + esc(p.category) + " &middot; " + esc(p.listing_type) + "</div>" +
+    '<div class="s">' + esc([p.town, p.district].filter(String).join(", ")) + "</div>" +
+    "<div><b>" + esc(money(p.price)) + (p.listing_type === "Rent" ? " / month" : "") + "</b></div>" +
+    '<div class="s">' + esc(perPerch(p)) + "</div></div></div></div>" +
+    '<div class="card"><h2>Checks</h2>' + ch + "</div>" +
+    '<div class="card"><h2>Status</h2>' +
+    fld("Availability", sel("availability", AVAIL), "Mark Sold only when really sold") +
+    fld("Show sold price publicly?", sel("show_sold_price", ["No", "Yes"]), "Yes only if the owner agreed") +
+    '<p class="hint">Currently: <b>' + esc(p.publish_status) + "</b></p>" +
+    '<p><button class="btn light full" data-act="savedraft">Save (keep as ' + esc(p.publish_status) + ")</button></p>" +
+    (isPub
+      ? '<p><button class="btn light full" data-act="unpublish">Unpublish (make Draft)</button></p>'
+      : '<p><button class="btn green full" data-act="publish"' + (ready ? "" : " disabled") + ">Publish now &#10003;</button></p>" +
+        (ready ? "" : '<p class="hint">Fill title, type, price and district to publish.</p>')) +
+    "</div>";
+}
+
+/* ---- 6. RENDER ---- */
+function render(msg) {
+  window.scrollTo(0, 0);
+  if (S.view === "login") app.innerHTML = viewLogin(msg);
+  else if (S.view === "list") app.innerHTML = viewList();
+  else app.innerHTML = viewEdit();
+}
+function renderStep() {
+  var s = document.getElementById("step");
+  if (s) s.innerHTML = stepHtml();
+  var bar = document.querySelector(".steps");
+  if (bar) bar.outerHTML = stepsBar();
+  window.scrollTo(0, 0);
+}
+
+/* ---- 7. ACTIONS ---- */
+function find(id) {
+  for (var i = 0; i < S.list.length; i++) if (S.list[i].property_id === id) return S.list[i];
+  return null;
+}
+function loadList(quiet) {
+  if (!quiet) toast("Loading...", false, true);
+  return api("list").then(function (r) {
+    if (r.error === "SESSION") return sessionEnd();
+    if (!r.ok) { toast(errText(r.error), true); return; }
+    S.list = r.properties || [];
+    hideToast();
+    S.view = "list";
+    render();
+  });
+}
+
+function doLogin() {
+  var u = document.getElementById("lg_user").value;
+  var p = document.getElementById("lg_pass").value;
+  if (!p) { render("Type your password."); return; }
+  S.user = u;
+  S.busy = true; toast("Logging in...", false, true);
+  api("login", { password: p }).then(function (r) {
+    S.busy = false; hideToast();
+    if (r.ok) { S.token = r.token; saveSession(); loadList(); return; }
+    var m = "Login failed.";
+    if (r.error === "BAD_LOGIN") m = "Wrong password." + (typeof r.left === "number" ? " Tries left: " + r.left : "");
+    else if (r.error === "LOCKED") m = "Too many wrong tries. Wait " + (r.minutes || 15) + " minutes.";
+    else if (r.error === "NO_PASSWORD_SET") m = "No password set for this user in Script properties.";
+    else m = errText(r.error);
+    S.token = ""; render(m);
+  });
+}
+
+function newProperty() {
+  S.edit = { listing_type: "Sale", category: "Land", currency: "LKR", negotiable: "Yes", location_privacy: "Approximate",
+    land_unit: "Perches", verification: "Owner-provided", publish_status: "Draft", availability: "Available",
+    featured: "No", show_sold_price: "No", price_confirmed_on: today() };
+  S.photos = []; S.step = 1; S.view = "edit"; render();
+}
+function editProperty(id) {
+  var p = find(id); if (!p) return;
+  S.edit = JSON.parse(JSON.stringify(p));
+  S.photos = String(p.photo_ids || "").split(",").map(function (s) { return s.trim(); }).filter(String);
+  S.step = 1; S.view = "edit"; render();
+}
+
+function buildData(extra) {
+  var d = { property_id: S.edit.property_id || "" };
+  EDITABLE.forEach(function (f) {
+    if (f === "photo_ids") d[f] = S.photos.join(",");
+    else if (S.edit[f] !== undefined) d[f] = S.edit[f];
+  });
+  d.price_period = S.edit.listing_type === "Rent" ? "month" : "";
+  Object.keys(extra || {}).forEach(function (k) { d[k] = extra[k]; });
+  return d;
+}
+function saveEdit(extra) {
+  return api("save", { data: buildData(extra) }).then(function (r) {
+    if (r.ok) {
+      S.edit.property_id = r.property_id;
+      if (extra) Object.keys(extra).forEach(function (k) { S.edit[k] = extra[k]; });
+    }
+    return r;
+  });
+}
+function afterSave(r, okMsg, then) {
+  S.busy = false;
+  if (r.error === "SESSION") return sessionEnd();
+  if (!r.ok) { toast(errText(r.error), true); return; }
+  toast(okMsg);
+  if (then) then();
+}
+
+function quick(id, extra, okMsg, confirmText) {
+  if (S.busy) return;
+  if (confirmText && !window.confirm(confirmText)) return;
+  S.busy = true; toast("Saving...", false, true);
+  var data = { property_id: id };
+  Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
+  api("save", { data: data }).then(function (r) {
+    afterSave(r, okMsg, function () { loadList(true); });
+  });
+}
+
+function goStep(n) {
+  if (n > 1 && !S.edit.property_id) return;
+  S.step = n; renderStep();
+}
+
+function doNext1() {
+  var p = S.edit;
+  if (!(p.title_si || p.title_en || p.title_ta)) { toast("Write a title in at least one language.", true); return; }
+  if (S.busy) return;
+  S.busy = true; toast("Saving...", false, true);
+  saveEdit().then(function (r) { afterSave(r, "Saved as " + S.edit.publish_status + " (" + S.edit.property_id + ")", function () { S.step = 2; render(); }); });
+}
+function doNext2() {
+  if (S.busy) return;
+  S.busy = true; toast("Saving...", false, true);
+  saveEdit().then(function (r) { afterSave(r, "Photos saved", function () { S.step = 3; render(); }); });
+}
+function doSaveDraft() {
+  if (S.busy) return;
+  S.busy = true; toast("Saving...", false, true);
+  saveEdit().then(function (r) { afterSave(r, "Saved", function () { loadList(true); }); });
+}
+function doPublish() {
+  var p = S.edit;
+  if (!(p.title_si || p.title_en || p.title_ta) || !p.category || !(Number(p.price) > 0) || !p.district) { toast("Fill title, type, price and district first.", true); return; }
+  if (!S.photos.length && !window.confirm("No photos yet. Publish anyway?")) return;
+  if (S.busy) return;
+  S.busy = true; toast("Publishing...", false, true);
+  saveEdit({ publish_status: "Published" }).then(function (r) { afterSave(r, "Published ✓", function () { loadList(true); }); });
+}
+function doUnpublish() {
+  if (S.busy) return;
+  S.busy = true; toast("Saving...", false, true);
+  saveEdit({ publish_status: "Draft" }).then(function (r) { afterSave(r, "Now a Draft", function () { loadList(true); }); });
+}
+
+/* photos */
+function shrink(file) {
+  return new Promise(function (res, rej) {
+    var url = URL.createObjectURL(file);
+    var im = new Image();
+    im.onload = function () {
+      var max = 1280, w = im.naturalWidth, h = im.naturalHeight;
+      var s = Math.min(1, max / Math.max(w, h));
+      var c = document.createElement("canvas");
+      c.width = Math.round(w * s); c.height = Math.round(h * s);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL("image/jpeg", 0.82));
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); rej(new Error("img")); };
+    im.src = url;
+  });
+}
+function handleFiles(files) {
+  var list = Array.prototype.slice.call(files || []);
+  if (!list.length || S.busy) return;
+  S.busy = true;
+  var i = 0, failed = 0;
+  function next() {
+    if (i >= list.length) {
+      S.busy = false;
+      toast(failed ? "Done. " + failed + " photo(s) failed." : "Photos added ✓", !!failed);
+      renderStep();
+      return;
+    }
+    var f = list[i++];
+    toast("Uploading photo " + i + " of " + list.length + "...", false, true);
+    shrink(f).then(function (dataUrl) {
+      return api("photo", { property_id: S.edit.property_id || "new", data: dataUrl });
+    }).then(function (r) {
+      if (r.error === "SESSION") { sessionEnd(); return; }
+      if (r.ok) S.photos.push(r.file_id); else failed++;
+      next();
+    }).catch(function () { failed++; next(); });
+  }
+  next();
+}
+
+/* ---- 8. EVENTS ---- */
+app.addEventListener("click", function (e) {
+  var b = e.target.closest ? e.target.closest("[data-act]") : null;
+  if (!b || b.disabled) return;
+  var a = b.getAttribute("data-act"), id = b.getAttribute("data-id");
+  if (a === "login") return doLogin();
+  if (a === "logout") { api("logout"); clearSession(); S.view = "login"; return render(); }
+  if (a === "refresh") return loadList();
+  if (a === "add") return newProperty();
+  if (a === "edit") return editProperty(id);
+  if (a === "cancel") { S.view = "list"; return loadList(true); }
+  if (a === "pub") return quick(id, { publish_status: "Published" }, "Published ✓");
+  if (a === "unpub") return quick(id, { publish_status: "Draft" }, "Now a Draft");
+  if (a === "sold") {
+    var p = find(id);
+    var st = p && p.listing_type === "Rent" ? "Rented" : "Sold";
+    return quick(id, { availability: st }, "Marked " + st, "Mark " + id + " as " + st.toUpperCase() + "? Only do this if it is really " + st.toLowerCase() + ".");
+  }
+  if (a === "back") return quick(id, { availability: "Available" }, "Back on the market");
+  if (a === "step1") return goStep(1);
+  if (a === "step2") return goStep(2);
+  if (a === "step3") return goStep(3);
+  if (a === "next1") return doNext1();
+  if (a === "next2") return doNext2();
+  if (a === "savedraft") return doSaveDraft();
+  if (a === "publish") return doPublish();
+  if (a === "unpublish") return doUnpublish();
+  if (a === "rmphoto") {
+    if (window.confirm("Remove this photo from the property?")) { S.photos.splice(Number(id), 1); renderStep(); }
+    return;
+  }
+  if (a === "cover") {
+    var x = S.photos.splice(Number(id), 1)[0]; S.photos.unshift(x); renderStep();
+  }
+});
+
+function onField(e) {
+  var t = e.target;
+  if (t.id === "flt") { S.filter = t.value; var c = document.getElementById("cards"); if (c) c.innerHTML = cardsHtml(); return; }
+  if (t.id === "q") { S.q = t.value; var c2 = document.getElementById("cards"); if (c2) c2.innerHTML = cardsHtml(); return; }
+  if (t.id === "files" && e.type === "change") { handleFiles(t.files); t.value = ""; return; }
+  var f = t.getAttribute ? t.getAttribute("data-f") : null;
+  if (f && S.edit) {
+    S.edit[f] = t.value;
+  }
+}
+app.addEventListener("input", onField);
+app.addEventListener("change", onField);
+app.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && e.target.id === "lg_pass") doLogin();
+});
+
+/* ---- 9. START ---- */
+(function start() {
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem("jp_admin") || "null"); } catch (e) {}
+  if (saved && saved.token && saved.user && (Date.now() - saved.t) < 5.8 * 3600 * 1000) {
+    S.user = saved.user; S.token = saved.token;
+    loadList();
+  } else {
+    S.view = "login"; render();
+  }
+})();
+})();
+</script>
+</body>
+</html>
