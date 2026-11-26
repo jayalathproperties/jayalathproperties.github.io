@@ -100,7 +100,12 @@
   /* ---------- styles ---------- */
   var css = document.createElement("style");
   css.textContent =
-    "#myAlerts{padding:34px 0 10px}#myAlerts .abox{background:#fff;border:1.5px solid #b9d1e8;border-radius:16px;padding:18px;box-shadow:0 5px 18px rgba(20,55,90,.06)}" +
+    "#myAlerts{padding:34px 0 10px}#myAlerts .abox{background:linear-gradient(135deg,#fffbeb,#fff3cd);border:2px solid #f59e0b;border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(245,158,11,.22)}" +
+    "#myAlerts .kicker{color:#b45309}.al-bell{display:inline-block;transform-origin:50% 8%;animation:alRing 5s ease-in-out infinite}" +
+    "@keyframes alRing{0%,14%,100%{transform:rotate(0)}2%{transform:rotate(16deg)}4%{transform:rotate(-14deg)}6%{transform:rotate(10deg)}8%{transform:rotate(-8deg)}10%{transform:rotate(4deg)}}" +
+    "#myAlerts .btn.al-set:not(.outline){background:#f59e0b;color:#1d2b3a;animation:alPulse 2.2s ease-out 3}#myAlerts .btn.al-set:not(.outline):hover{background:#d97706;color:#fff}" +
+    "@keyframes alPulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,.55)}70%{box-shadow:0 0 0 14px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}" +
+    "@media (prefers-reduced-motion:reduce){.al-bell,#myAlerts .btn.al-set{animation:none!important}}" +
     "#myAlerts h2{margin:4px 0 6px;color:var(--navy,#12365c);font-size:22px}#myAlerts .ai{color:var(--muted,#68788a);margin:0 0 12px}" +
     ".al-sum{background:#eef5fc;border-radius:10px;padding:10px 12px;margin:0 0 10px;font-weight:700;color:#12365c}" +
     ".al-head{font-weight:900;color:#12365c;margin:10px 0 6px}.al-new{color:#b45309}" +
@@ -118,7 +123,7 @@
   function build() {
     var props = $("#properties"); if (!props) return;
     sec = document.createElement("section"); sec.id = "myAlerts";
-    sec.innerHTML = '<div class="wrap"><div class="abox"><div class="kicker al-k"></div><h2 class="al-t"></h2><div class="al-body"></div>' +
+    sec.innerHTML = '<div class="wrap"><div class="abox"><div class="kicker al-k"></div><h2 class="al-t"><span class="al-bell">\uD83D\uDD14</span> <span class="al-tt"></span></h2><div class="al-body"></div>' +
       '<div class="al-app" hidden><div class="al-head al-at"></div><p class="al-ap"></p>' +
       '<button type="button" class="btn install-btn" hidden onclick="installApp()"></button><div class="al-ios" hidden></div></div></div></div>';
     props.parentNode.insertBefore(sec, props);
@@ -142,7 +147,7 @@
 
   function render() {
     if (!sec) return;
-    $(".al-k", sec).textContent = t("kicker"); $(".al-t", sec).textContent = t("title");
+    $(".al-k", sec).textContent = t("kicker"); $(".al-tt", sec).textContent = t("title").replace(/^\uD83D\uDD14\s*/, "");
     var p = load(), body = $(".al-body", sec);
     if (!p) {
       body.innerHTML = '<p class="ai">' + esc(t("intro")) + '</p><button type="button" class="btn al-set">' + esc(t("set")) + "</button>";
