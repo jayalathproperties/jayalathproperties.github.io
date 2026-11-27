@@ -133,7 +133,8 @@ body.menu-open .mobile-drawer{transform:translateX(0)}
 <button type="button" class="chip" onclick="quickSearch('Buy','Land','','','agri')">Agricultural land for sale</button>
 <button type="button" class="chip" onclick="quickSearch('Buy','House','Kandy','','')">Houses for sale in Kandy</button>
 <button type="button" class="chip" onclick="quickSearch('Buy','Hotel','','','')">Hotels for sale in Sri Lanka</button>
-</div></div></section>
+</div>
+<p style="margin:16px 0 0"><a class="textlink" href="land-for-sale-in-sri-lanka.html" data-en="📖 Read our guide: Land for sale in Sri Lanka →" data-si="📖 අපගේ මාර්ගෝපදේශය කියවන්න: ශ්‍රී ලංකාවේ විකිණීමට ඇති ඉඩම් →" data-ta="📖 எங்கள் வழிகாட்டியைப் படியுங்கள்: இலங்கையில் விற்பனைக்கான காணி →">📖 Read our guide: Land for sale in Sri Lanka →</a></p></div></section>
 <section id="properties"><div class="wrap">
 <div class="section-head"><div><div class="kicker">Explore properties</div><h2>Featured Properties</h2><p class="muted">Demo examples only — not verified offers or current market prices.</p></div><button class="btn outline" onclick="showAll()">View all properties</button></div>
 <div class="cards" id="propertyCards">
@@ -228,6 +229,7 @@ let sellerRequestIntro='';
 function openSellerModal(kind){sellerRequestIntro=kind;document.getElementById('sellerRequestType').value=kind;document.getElementById('sellerModal').classList.add('show')}
 function closeSellerModal(){document.getElementById('sellerModal').classList.remove('show')}
 function openBuyerModal(){document.getElementById('buyerModal').classList.add('show')}
+window.addEventListener('load',function(){if(location.hash==='#tell-us'){setTimeout(openBuyerModal,300)}});
 function closeBuyerModal(){document.getElementById('buyerModal').classList.remove('show')}
 function submitBuyerRequest(e){e.preventDefault();const v=id=>document.getElementById(id).value.trim();const lines=['Hello Jayalath, I am looking for a property.','Name: '+v('buyerName'),'Phone/WhatsApp: '+v('buyerPhone'),'Email: '+v('buyerEmail'),'Country of residence: '+v('buyerCountry'),'Preferred language: '+v('buyerLang'),'Preferred contact: '+v('buyerContact'),'Property type: '+v('buyerType'),'Preferred district: '+v('buyerDistrict'),'Preferred town/area: '+v('buyerTown'),'Minimum budget (LKR): '+v('buyerMin'),'Maximum budget (LKR): '+v('buyerMax'),'Additional requirements: '+v('buyerDetails'),'Please contact me to discuss suitable property options.'];window.open('https://wa.me/94765606450?text='+encodeURIComponent(lines.join('\n')),'_blank');closeBuyerModal()}
 function submitSellerRequest(e){e.preventDefault();const v=id=>document.getElementById(id).value.trim();const lines=['Hello Jayalath, I would like to submit a property owner request.','Request: '+v('sellerRequestType'),'Owner name: '+v('sellerName'),'Phone/WhatsApp: '+v('sellerPhone'),'Email: '+v('sellerEmail'),'Property type: '+v('sellerPropertyType'),'District: '+v('sellerDistrict'),'Town/Area: '+v('sellerTown'),'Expected price (LKR): '+v('sellerPrice'),'Land size/floor area: '+v('sellerSize'),'Description: '+v('sellerDetails'),'Please contact me to discuss verification, terms and next steps.'];window.open('https://wa.me/94765606450?text='+encodeURIComponent(lines.join('\n')),'_blank');closeSellerModal();}
